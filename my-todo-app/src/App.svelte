@@ -1,74 +1,64 @@
 <script>
-
-
 // do the part a button to make more buttons
-let categories = [
+$: categories = [
 		{ done: false, text: 'General' },
 		{ done: false, text: 'Homework'},
 		{ done: false, text: 'Chores'}
 	];
 
 	function add() {
-		categories = categories.concat({ done: false, text: '' });
+		categories = [{
+			done: false,
+			text: ''
+		}, ...categories];
+		//categories = categories.concat({ done: false, text: '' });
 	}
 
-	/*function deletecategory() {
-		if (categories.done) 
-			categories = categories.;		
-	}*/
+	function showlabel(categories) {
+		categories.forEach(category => {
+			if (category.done===true){
+				return category.text;
+			}
+		});
+	}
 
 
+	$: taskstodo = todos1.length;
+	$: selected = "";
+	$: selected1 = {done: false,
+					text: ''};
+	let mytasks = [];
 
-//do the task remaining
-
-/*function taskleft() {
-	/*todos1.forEach(todo => {
-		if (todo.status == 'incomplete'){
-			count = count + 1;
-		}
-	});	
-	return taskstodo;
-}*/
-
-
-
-
-//do the label changing accoring to what button was clicked
- 
-
-
-	"first do the same thing for the general that you did for the todos portion"
-	"so you will have two different arrays that aren't related to each other/"
-	"Once yuo do that you will have a click action on each task that should toggle"
-	"the categories section "
-
-	"What you can do is "
-	$: taskstodo = 0;
-
-
-	let todos1 = []
+	let todos1 = [];
 	let bigTasks1 = []
-	let subCategories1 = []
 	let task1 = "";
 	let bigTask1 = "";
 	let filter1='all';
+
+
 	function addTask1(){
-		taskstodo = taskstodo + 1;
+		//taskstodo = taskstodo + 1;
 		todos1 = [{
 			task1:task1,
-			status1:"pending"
+			status1:"pending",
+			category: selected
 		}, ...todos1];
 		task1 = "";
+		assignsubCategories()
+	}
+	function assignsubCategories() {
+		mytasks = []
+		todos1.forEach(element => {if (element.category === selected) {
+  		mytasks = [...mytasks,element]}})
 	}
 	function markComplete1(i){
 		todos1[i].status1 = "completed";
-		taskstodo = taskstodo - 1;
-		console.log("Suh dudes marking as complete");
+		//taskstodo = taskstodo - 1;
 		todos1 = [...todos1];
 	}
 	function removeTask1(i){
 		if(i.status==='incomplete') {
-			taskstodo = taskstodo - 1;
+			//taskstodo = taskstodo - 1;
 		}
 		console.log(taskstodo);
 		todos1.splice(i,1);
@@ -77,14 +67,11 @@ let categories = [
 	function addBigTask1(){
 		bigTasks1 = [{
 			bigTask1:bigTask1,
-			subCategories1: todos1
-
+			subCategories1: []
 		}, ...bigTasks1];
 		bigTask1 = "";
 	}
 
-
-	
 </script>
 
 <main>
@@ -101,75 +88,42 @@ let categories = [
 	<div class ="categoryBox">
 		<h2>Categories</h2>
 		{#each categories as category}
-		<div class:done={category.done}>
+		<div>
 			<input
 				type=checkbox
-				checked={category.done}
-			>
+				bind:group={selected} 
+				value={category.text}
+				on:input={assignsubCategories}	
 
+			>
 			<input
 				placeholder="Enter new category"
 				value={category.text}
 			>
 		</div>
 		{/each}
-
-
-		<button on:click={add}>
+		<!--<button on:click={add}>
 			Add new
-		</button>
-		<!--<button on:click={deletecategory}>
-			Delete Checked List
-		</button>-->
-		
-
+		</button> -->
 	
 	</div>	
-
-
-
-		<!--
-        <div class = "categoryBox">
-            <h2>Categories</h2>
-            <ul class = "categoryList" data-category>
-                <li class = "category_name">General</li>
-                <li class = "category_name">Homework</li>
-                <li class = "category_name">Chores</li>     
-            </ul>
-
-            <form action="">
-                <input 
-                    type = "text"
-                    class = "new_category"
-                    placeholder = "Enter New Category"
-                    aria-label="new_category_name"
-                />
-            
-            <button class="btn_create" aria-label="create_new_category">+</button>   
-            </form>
-        </div>
--->
+	
 		<div class="taskBox">
 			<div>
-
-
+				{#if selected === "" }
+				<p>Click on a Category to add Tasks</p>
+				{/if}
                 <h2 id = "taskheader">
-					{#each categories as category}
-						{#if category.done}
-							hello {category.text}
-						{/if}
-					{/each}
+					{selected}
 				</h2>
-
-
-
 				
                 <p id = "taskremaining"> {taskstodo} tasks remaining</p>
             </div>
 
+
 			<div class="todo1">     
 				<div class="tasks1">
-					{#each todos1 as todo1, i}
+					{#each mytasks as todo1, i}
 						{#if filter1=='all'}
 							<div class="task1">
 								<div>
@@ -206,13 +160,23 @@ let categories = [
 							{/if}
 						{/if}
 					{/each}
+					{#if selected != "" }
 					<div class="form">
+						
 						<input type="text" bind:value={task1}/>
 						<button on:click={addTask1}>
 							Add
 						</button>
+						
 					</div>
+					{/if}
+
+
+
+
 			</div>
+		
+			{#if selected != "" }
 			<div class="filters">
 				<button class="{filter1=='all'?'active':''}" on:click={()=>{filter1='all'}}>
 					All
@@ -224,6 +188,7 @@ let categories = [
 					Incomplete
 				</button>
 			</div>
+			{/if}
 		</div>
 
 
@@ -235,59 +200,12 @@ let categories = [
 
 
 
-<!-- 
-        <div class="taskBox">
-            <div>
-                <h2 id = "taskheader">General</h2>
-                <p id = "taskremaining">2 tasks remaining</p>
-            </div>
-
-            <div class="toDoTaskListBody">
-                <div class="task">
-                    <div class="task">
-                        <input type="checkbox" id="task1"/>
-                        <label for="task1" class ="label1">
-                            <span class="customCheckbox"></span>
-                            Complete all Chores
-                        </label>
-                    </div>    -->
-                    <!--task 1 under General above-->
-<!-- 
-                    <div class="task">
-                        <div class="task">
-                            <input type="checkbox" id="task2"/>
-                            <label for="task2" class ="label1">
-                                <span class="customCheckbox"></span>
-                                Complete all Homework
-                            </label>
-                        </div>   -->
-                        <!--task 2 under General above-->
- <!--                </div>
-
-                <div class="createNewTask">  <!-- enter new task for the list at the bottom of task list-->
- <!--                    <form action="">
-                        <input 
-                          type="text" bind:value={bigTask}
-                          class="new_task"
-                          placeholder="Enter New Task"
-                          aria-label="new_task_name"
-                        />
-
-                        <button on:click={addBigTask} class="btn_create" aria-label="create_new_task">+</button>
-                      </form>
-
-                </div>
-
-
-            </div>
-        </div>   -->
-
 
 
 
     </body>
+	
 </main>
-
 <style>
     body{
         background-color: #d6cbd3;
